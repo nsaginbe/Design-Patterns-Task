@@ -1,3 +1,5 @@
+package prototype;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +14,7 @@ public class PrototypeRegistry {
         mealList.add(result);
     }
 
-    Prototype getByMainDish(String mainDish) {
+    public Prototype getByMainDish(String mainDish) {
         for (Prototype meal : mealList) {
             if (meal.getMainDish().equals(mainDish)) {
                 return meal.clone();
@@ -21,7 +23,7 @@ public class PrototypeRegistry {
         return null;
     }
 
-    Prototype getBySide(String side) {
+    public Prototype getBySide(String side) {
         for (Prototype meal : mealList) {
             if (meal.getSide().equals(side)) {
                 return meal.clone();
@@ -30,7 +32,7 @@ public class PrototypeRegistry {
         return null;
     }
 
-    Prototype getByDrink(String drink) {
+    public Prototype getByDrink(String drink) {
         for (Prototype meal : mealList) {
             if (meal.getDrink().equals(drink)) {
                 return meal.clone();

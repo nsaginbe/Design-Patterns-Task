@@ -1,8 +1,18 @@
+import adapter.DeliveryService;
+import adapter.MealAdapter;
+import builder.Director;
+import builder.Meal;
+import builder.MealBuilder;
+import prototype.Prototype;
+import prototype.PrototypeRegistry;
+import singleton.Menu;
+
 import java.util.Scanner;
 
 public class Application {
     private static final Scanner sc = new Scanner(System.in);
     private static final PrototypeRegistry registry = new PrototypeRegistry();
+    private static final DeliveryService deliveryService = new DeliveryService();
 
     public static void main(String[] args) {
         System.out.println("Welcome!");
@@ -19,7 +29,7 @@ public class Application {
             else break;
         }
 
-        while (true){
+        while (!registry.getMealList().isEmpty()){
             System.out.println("Do you wanna edit your meal? (YES/NO)");
             String choice = sc.nextLine();
 
@@ -27,9 +37,73 @@ public class Application {
             else break;
         }
 
-        for (Prototype meal : registry.getMealList()) {
-            System.out.println(meal);
+        showAllMeals();
+
+        if (!registry.getMealList().isEmpty()) {
+            selectCookingStyle();
+            deliverMeal();
         }
+    }
+
+    private static void showAllMeals() {
+        for (int i = 0; i < registry.getMealList().size(); i++) {
+            System.out.println((i + 1) + ". " + registry.getMealList().get(i));
+        }
+    }
+
+    private static void selectCookingStyle() {
+        System.out.println("Available cooking styles: " + Menu.getInstance().getAllStyles());
+
+        for (int i = 0; i < registry.getMealList().size(); i++) {
+            System.out.println("Select cooking style for " + (i + 1) + " meal:");
+
+            String cookingStyle;
+            while (true) {
+                cookingStyle = sc.nextLine();
+
+                if (!Menu.getInstance().getAllStyles().contains(cookingStyle)) {
+                    System.out.println("UNAVAILABLE");
+                }
+                else break;
+            }
+
+            Meal meal = (Meal) registry.getMealList().get(i);
+            meal.setCookingStyle(cookingStyle);
+
+            // Now cook!
+            meal.cook();
+        }
+
+        showAllMeals();
+    }
+
+    private static void deliverMeal() {
+        int index;
+        while (true) {
+            System.out.println("Which meal do you want to deliver? (index)");
+
+            try {
+                index = Integer.parseInt(sc.nextLine());
+            }
+            catch (Exception e) {
+                System.out.println("UNAVAILABLE");
+                continue;
+            }
+
+            if (index <= 0 || index > registry.getMealList().size()) {
+                System.out.println("UNAVAILABLE");
+                continue;
+            }
+            break;
+        }
+
+        System.out.println("Enter delivery address:");
+        String address = sc.nextLine();
+
+        deliveryService.setDestinationAddress(address);
+
+        MealAdapter adapter = new MealAdapter((Meal) registry.getMealList().get(index - 1));
+        deliveryService.deliver(adapter.getPackedMeal());
     }
 
     private static void showMenu() {

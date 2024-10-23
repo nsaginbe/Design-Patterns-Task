@@ -1,3 +1,5 @@
+package builder;
+
 // Builder interface
 public interface Builder {
     void reset();

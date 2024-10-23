@@ -1,3 +1,7 @@
+package builder;
+
+import prototype.Prototype;
+
 // Director (прораб)
 public class Director {
 

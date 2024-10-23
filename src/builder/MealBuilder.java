@@ -1,3 +1,5 @@
+package builder;
+
 // Concrete Builder
 public class MealBuilder implements Builder {
     private Meal meal;

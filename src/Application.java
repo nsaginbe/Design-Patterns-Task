@@ -3,10 +3,15 @@ import adapter.MealAdapter;
 import builder.Director;
 import builder.Meal;
 import builder.MealBuilder;
+import facade.MealType;
+import flyweight.MealFactory;
 import prototype.Prototype;
 import prototype.PrototypeRegistry;
+import proxy.Feedback;
+import proxy.Proxy;
 import singleton.Menu;
 
+import java.util.Random;
 import java.util.Scanner;
 
 public class Application {
@@ -43,6 +48,13 @@ public class Application {
             selectCookingStyle();
             deliverMeal();
         }
+
+        // Proxy
+
+        Feedback feedback = new Feedback("Everything is fine!");
+        Proxy proxy = new Proxy(feedback);
+
+        System.out.println("Feedback:\n" + proxy.sendFeedback());
     }
 
     private static void showAllMeals() {
@@ -119,7 +131,14 @@ public class Application {
         String side = selectSide();
         String drink = selectDrink();
 
-        director.constructMeal(builder, mainDish, side, drink);
+        // Context (flyweight)
+        MealType mealType = MealFactory.getMealType(mainDish, side, drink);
+        Meal meal = new Meal(
+                new Random().nextInt(100) + 1,
+                mealType
+        );
+
+        director.constructMeal(builder, meal);
         registry.add(builder.getResult());
     }
 
@@ -157,6 +176,7 @@ public class Application {
     private static void editMeal(Director director, MealBuilder builder) {
         Prototype newMeal = searchMeal();
 
+        int cost = newMeal.getCost();
         String mainDish = newMeal.getMainDish();
         String side = newMeal.getSide();
         String drink = newMeal.getDrink();
@@ -194,7 +214,7 @@ public class Application {
             }
         }
 
-        director.constructMeal(builder, mainDish, side, drink);
+        director.constructMeal(builder, cost, mainDish, side, drink);
         registry.add(builder.getResult());
     }
 

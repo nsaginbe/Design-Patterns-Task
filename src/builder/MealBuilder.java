@@ -13,17 +13,15 @@ public class MealBuilder implements Builder {
         meal = new Meal();
     }
 
-    @Override
+    public void setCost(int cost) {
+        meal.setCost(cost);
+    }
     public void setMainDish(String mainDish) {
         meal.setMainDish(mainDish);
     }
-
-    @Override
     public void setSide(String side) {
         meal.setSide(side);
     }
-
-    @Override
     public void setDrink(String drink) {
         meal.setDrink(drink);
     }

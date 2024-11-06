@@ -4,42 +4,34 @@ import bridge.Cooking;
 import bridge.ToFry;
 import bridge.ToGrill;
 import bridge.ToSteam;
+import facade.MealType;
 import prototype.Prototype;
 
+import java.util.Random;
+
 // Product
+// Unique (from Flyweight)
 public class Meal implements Prototype {
     // Bridge
     private Cooking cooking = null;
 
-    private String mainDish;
-    private String side;
-    private String drink;
+    // Unique
+    private int cost;
+    // Repeating
+    private MealType mealType = new MealType();
 
-    public Meal() { }
-    public Meal(Meal meal) {
-        this.mainDish = meal.mainDish;
-        this.side = meal.side;
-        this.drink = meal.drink;
+    public Meal() {}
+
+    // Flyweight
+    public Meal(int cost, MealType mealType) {
+        this.cost = cost;
+        this.mealType = mealType;
     }
 
-    public void setMainDish(String mainDish) {
-        this.mainDish = mainDish;
-    }
-
-    public void setSide(String side) {
-        this.side = side;
-    }
-
-    public void setDrink(String drink) {
-        this.drink = drink;
-    }
-
-    public String toString() {
-        return "Meal[mainDish=" + mainDish +
-                ", side=" + side +
-                ", drink=" + drink +
-                ", cookingStyle=" + (cooking == null ? "" : cooking.getCookingStyle()) +
-                "]";
+    // Cloning (from Prototype)
+    public Meal (Meal meal) {
+        this.cost = meal.cost;
+        this.mealType = meal.mealType;
     }
 
     @Override
@@ -47,19 +39,42 @@ public class Meal implements Prototype {
         return new Meal(this);
     }
 
-    @Override
+    // Setters
+    public void setCost(int cost) {
+        this.cost = cost;
+    }
+    public void setMainDish(String mainDish) {
+        this.mealType.setMainDish(mainDish);
+    }
+    public void setSide(String side) {
+        this.mealType.setSide(side);
+    }
+    public void setDrink(String drink) {
+        this.mealType.setDrink(drink);
+    }
+
+    // Getters
+    public int getCost() {
+        return cost;
+    }
     public String getMainDish() {
-        return mainDish;
+        return mealType.getMainDish();
     }
-
-    @Override
     public String getSide() {
-        return side;
+        return mealType.getSide();
+    }
+    public String getDrink() {
+        return mealType.getDrink();
     }
 
-    @Override
-    public String getDrink() {
-        return drink;
+    // To string method
+    public String toString() {
+        return "Meal[cost=" + cost +
+                ", mainDish=" + mealType.getMainDish() +
+                ", side=" + mealType.getSide() +
+                ", drink=" + mealType.getDrink() +
+                ", cookingStyle=" + (cooking == null ? "" : cooking.getCookingStyle()) +
+                "]";
     }
 
     // Bridge

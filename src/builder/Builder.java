@@ -1,5 +1,7 @@
 package builder;
 
+import java.util.List;
+
 // Builder interface
 public interface Builder {
     void reset();
@@ -7,4 +9,5 @@ public interface Builder {
     void setMainDish(String mainDish);
     void setSide(String side);
     void setDrink(String drink);
+    void setPreferences(List<String> preferences);
 }

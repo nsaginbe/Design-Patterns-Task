@@ -3,10 +3,15 @@ import adapter.MealAdapter;
 import builder.Director;
 import builder.Meal;
 import builder.MealBuilder;
+import chainofresponsibility.*;
+import command.Command;
+import command.DiscountCommand;
+import command.OrderManager;
 import facade.MealType;
 import flyweight.MealFactory;
 import prototype.Prototype;
 import prototype.PrototypeRegistry;
+import proxy.Configuration;
 import proxy.Feedback;
 import proxy.Proxy;
 import singleton.Menu;
@@ -44,13 +49,35 @@ public class Application {
 
         showAllMeals();
 
+        // Command
+        if (Configuration.PASS) {
+            int discount = Configuration.DISCOUNT;
+            OrderManager sender = new OrderManager();
+
+            System.out.println(
+                    "Congratulations!\n" +
+                    "You have " + discount + " discount left");
+
+            for (int i = 0; i < registry.getMealList().size(); i++) {
+                Meal meal = (Meal) registry.getMealList().get(i);
+
+                if (meal.getCost() >= discount) {
+                    Command discountCommand = new DiscountCommand(meal, discount);
+                    sender.executeCommand(discountCommand);
+
+                    discount = 0;
+                }
+            }
+
+            showAllMeals();
+        }
+
         if (!registry.getMealList().isEmpty()) {
             selectCookingStyle();
             deliverMeal();
         }
 
         // Proxy
-
         Feedback feedback = new Feedback("Everything is fine!");
         Proxy proxy = new Proxy(feedback);
 
@@ -138,8 +165,68 @@ public class Application {
                 mealType
         );
 
+        // Chain of responsibility
+        System.out.println("Do you wanna add preferences? (YES/NO)");
+        String choice = sc.nextLine();
+
+        if (choice.equals("YES")) addPreferences(meal);
+
         director.constructMeal(builder, meal);
         registry.add(builder.getResult());
+    }
+
+    // Chain of responsibility
+    private static void addPreferences(Meal meal) {
+        System.out.print("""
+                        What preferences do you want?
+                        1. Vegan
+                        2. Extra Nan
+                        3. Extra Salt
+                        """);
+
+        String sequence;
+        while (true) {
+            sequence = sc.nextLine();
+
+            boolean allDigit = true;
+            for (char c : sequence.toCharArray()) {
+                if (!Character.isDigit(c)) {
+                    allDigit = false;
+                    break;
+                }
+                else if (c < '1' || c > '3'){
+                    allDigit = false;
+                    break;
+                }
+            }
+
+            if (!allDigit) {
+                System.out.println("NOT VALID");
+                continue;
+            }
+            break;
+        }
+
+        Request request = new EmptyRequest();
+
+        Request last = request;
+        for (int i = 0; i < sequence.length(); i++) {
+            Request temp;
+            if (sequence.charAt(i) == '1'){
+                temp = new DietaryRequest();
+            }
+            else if (sequence.charAt(i) == '2'){
+                temp = new IngredientRequest(15);
+            }
+            else {
+                temp = new PreparationRequest(3);
+            }
+
+            last.setNext(temp);
+            last = temp;
+        }
+
+        request.handleRequest(meal);
     }
 
     private static String selectMainDish() {

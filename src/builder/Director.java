@@ -21,5 +21,7 @@ public class Director {
         builder.setMainDish(meal.getMainDish());
         builder.setSide(meal.getSide());
         builder.setDrink(meal.getDrink());
+        builder.setPreferences(meal.getPreferences());
+
     }
 }

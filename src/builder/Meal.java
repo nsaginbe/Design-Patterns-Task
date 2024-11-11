@@ -7,11 +7,16 @@ import bridge.ToSteam;
 import facade.MealType;
 import prototype.Prototype;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 // Product
 // Unique (from Flyweight)
 public class Meal implements Prototype {
+    // Chain Of Responsibility
+    public List<String> preferences = new ArrayList<>();
+
     // Bridge
     private Cooking cooking = null;
 
@@ -52,6 +57,9 @@ public class Meal implements Prototype {
     public void setDrink(String drink) {
         this.mealType.setDrink(drink);
     }
+    public void setPreferences(List<String> preferences) {
+
+    }
 
     // Getters
     public int getCost() {
@@ -66,6 +74,9 @@ public class Meal implements Prototype {
     public String getDrink() {
         return mealType.getDrink();
     }
+    public List<String> getPreferences() {
+        return preferences;
+    }
 
     // To string method
     public String toString() {
@@ -74,6 +85,7 @@ public class Meal implements Prototype {
                 ", side=" + mealType.getSide() +
                 ", drink=" + mealType.getDrink() +
                 ", cookingStyle=" + (cooking == null ? "" : cooking.getCookingStyle()) +
+                ", preferences=" + preferences +
                 "]";
     }
 

@@ -1,5 +1,7 @@
 package builder;
 
+import java.util.List;
+
 // Concrete Builder
 public class MealBuilder implements Builder {
     private Meal meal;
@@ -24,6 +26,9 @@ public class MealBuilder implements Builder {
     }
     public void setDrink(String drink) {
         meal.setDrink(drink);
+    }
+    public void setPreferences(List<String> preferences) {
+        meal.preferences = preferences;
     }
 
     public Meal getResult(){

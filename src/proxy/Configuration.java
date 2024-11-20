@@ -2,6 +2,6 @@ package proxy;
 
 public interface Configuration {
     String USER = "authorized";
-    boolean PASS = true;
+    boolean PASS = false;
     int DISCOUNT = 5;
 }

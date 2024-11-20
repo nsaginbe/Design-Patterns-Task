@@ -9,6 +9,11 @@ import command.DiscountCommand;
 import command.OrderManager;
 import facade.MealType;
 import flyweight.MealFactory;
+import iterator.Collection;
+import iterator.Iterator;
+import iterator.OrderList;
+import iterator.Receipt;
+import mediator.*;
 import prototype.Prototype;
 import prototype.PrototypeRegistry;
 import proxy.Configuration;
@@ -51,26 +56,14 @@ public class Application {
 
         // Command
         if (Configuration.PASS) {
-            int discount = Configuration.DISCOUNT;
-            OrderManager sender = new OrderManager();
-
-            System.out.println(
-                    "Congratulations!\n" +
-                    "You have " + discount + " discount left");
-
-            for (int i = 0; i < registry.getMealList().size(); i++) {
-                Meal meal = (Meal) registry.getMealList().get(i);
-
-                if (meal.getCost() >= discount) {
-                    Command discountCommand = new DiscountCommand(meal, discount);
-                    sender.executeCommand(discountCommand);
-
-                    discount = 0;
-                }
-            }
-
-            showAllMeals();
+            premiumBenefits();
         }
+
+        // Iterator
+        Collection orderList = new OrderList(registry.getMealList());
+        applyDiscount(orderList);
+        printReceipt(orderList);
+
 
         if (!registry.getMealList().isEmpty()) {
             selectCookingStyle();
@@ -78,10 +71,65 @@ public class Application {
         }
 
         // Proxy
-        Feedback feedback = new Feedback("Everything is fine!");
+        sendFeedback("Everything is fine!");
+
+        // Mediator
+        waiterWork();
+    }
+
+    private static void waiterWork() {
+        Mediator waiter = new Waiter();
+
+        Client man = new Man("Josh", waiter);
+        Client woman = new Woman("Aruzhan", waiter);
+        Client commission = new Commission("Nursultan", waiter);
+
+        man.action("gift");
+        woman.action("gift");
+        commission.action("complaint");
+    }
+
+    private static void printReceipt(Collection list) {
+        Iterator iterator = list.createIterator();
+        int totalCost = Receipt.calculateTotalCost(iterator);
+
+        System.out.println("\nTotal cost: " + totalCost);
+    }
+
+    private static void applyDiscount(Collection list) {
+        System.out.println("\nCongrats!\nYou won special 20% discount for besh:");
+
+        Iterator iterator = list.createIterator();
+        Receipt.applyDiscount(iterator);
+
+        showAllMeals();
+    }
+
+    private static void premiumBenefits() {
+        int discount = Configuration.DISCOUNT;
+        OrderManager sender = new OrderManager();
+
+        System.out.println("Congratulations!\n" + "You have " + discount + " discount left");
+
+        for (int i = 0; i < registry.getMealList().size(); i++) {
+            Meal meal = (Meal) registry.getMealList().get(i);
+
+            if (meal.getCost() >= discount) {
+                Command discountCommand = new DiscountCommand(meal, discount);
+                sender.executeCommand(discountCommand);
+
+                discount = 0;
+            }
+        }
+
+        showAllMeals();
+    }
+
+    private static void sendFeedback(String userFeedback) {
+        Feedback feedback = new Feedback(userFeedback);
         Proxy proxy = new Proxy(feedback);
 
-        System.out.println("Feedback:\n" + proxy.sendFeedback());
+        System.out.println("\nFeedback:\n" + proxy.sendFeedback() + "\n");
     }
 
     private static void showAllMeals() {
@@ -91,7 +139,7 @@ public class Application {
     }
 
     private static void selectCookingStyle() {
-        System.out.println("Available cooking styles: " + Menu.getInstance().getAllStyles());
+        System.out.println("\nAvailable cooking styles: " + Menu.getInstance().getAllStyles());
 
         for (int i = 0; i < registry.getMealList().size(); i++) {
             System.out.println("Select cooking style for " + (i + 1) + " meal:");
@@ -117,10 +165,10 @@ public class Application {
     }
 
     private static void deliverMeal() {
+        System.out.println("\nWhich meal do you want to deliver? (index)");
+
         int index;
         while (true) {
-            System.out.println("Which meal do you want to deliver? (index)");
-
             try {
                 index = Integer.parseInt(sc.nextLine());
             }

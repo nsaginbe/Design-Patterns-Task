@@ -6,6 +6,8 @@ import bridge.ToGrill;
 import bridge.ToSteam;
 import facade.MealType;
 import prototype.Prototype;
+import state.CreatedState;
+import state.State;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,25 @@ import java.util.Random;
 // Product
 // Unique (from Flyweight)
 public class Meal implements Prototype {
+
+    // State
+    private State state;
+
+    {
+        state = new CreatedState(this);
+    }
+
+    public void changeState(State state) {
+        this.state = state;
+    }
+
+    public void nextState() {
+        state.nextState();
+    }
+    public void prevState() {
+        state.prevState();
+    }
+
     // Chain Of Responsibility
     public List<String> preferences = new ArrayList<>();
 
@@ -25,7 +46,8 @@ public class Meal implements Prototype {
     // Repeating
     private MealType mealType = new MealType();
 
-    public Meal() {}
+    public Meal() {
+    }
 
     // Flyweight
     public Meal(int cost, MealType mealType) {
@@ -80,7 +102,8 @@ public class Meal implements Prototype {
 
     // To string method
     public String toString() {
-        return "Meal[cost=" + cost +
+        return "Meal[state=" + state.getCurrentState() +
+                ", cost=" + cost +
                 ", mainDish=" + mealType.getMainDish() +
                 ", side=" + mealType.getSide() +
                 ", drink=" + mealType.getDrink() +

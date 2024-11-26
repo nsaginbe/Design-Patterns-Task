@@ -6,18 +6,16 @@ import java.util.List;
 
 public class Menu {
     private static Menu instance = null;
-    private final String[] allMainDishes;
-    private final String[] allSides;
-    private final String[] allDrinks;
-
-    private final String[] allStyles;
+    private final List<String> allMainDishes;
+    private final List<String> allSides;
+    private final List<String> allDrinks;
+    private final List<String> allStyles;
 
     private Menu() {
-        allMainDishes = new String[]{"pasta", "soup", "besh"};
-        allSides = new String[]{"salad", "fries", "nanmenmai"};
-        allDrinks = new String[]{"cola", "water", "qymyz"};
-
-        allStyles = new String[]{"grilled", "fried", "steamed"};
+        allMainDishes = new ArrayList<>(Arrays.asList("pasta", "soup", "besh"));
+        allSides = new ArrayList<>(Arrays.asList("salad", "fries", "nanmenmai"));
+        allDrinks = new ArrayList<>(Arrays.asList("cola", "water", "qymyz"));
+        allStyles = new ArrayList<>(Arrays.asList("grilled", "fried", "steamed"));
     }
 
     public static synchronized Menu getInstance() {
@@ -28,14 +26,25 @@ public class Menu {
     }
 
     public List<String> getAllMainDishes() {
-        return new ArrayList<>(Arrays.asList(allMainDishes));
+        return allMainDishes;
     }
     public List<String> getAllSides() {
-        return new ArrayList<>(Arrays.asList(allSides));
+        return allSides;
     }
     public List<String> getAllDrinks() {
-        return new ArrayList<>(Arrays.asList(allDrinks));
+        return allDrinks;
+    }
+    public List<String> getAllStyles() {
+        return allStyles;
     }
 
-    public List<String> getAllStyles() {return new ArrayList<>(Arrays.asList(allStyles));}
+    public void addMainDish(String mainDish) {
+        allMainDishes.add(mainDish);
+    }
+    public void addSide(String side) {
+        allSides.add(side);
+    }
+    public void addDrink(String drink) {
+        allDrinks.add(drink);
+    }
 }

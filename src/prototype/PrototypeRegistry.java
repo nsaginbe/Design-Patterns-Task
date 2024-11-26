@@ -1,10 +1,13 @@
 package prototype;
 
+import memento.OrderMemento;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class PrototypeRegistry {
-    private final List<Prototype> mealList = new ArrayList<>();
+    private List<Prototype> mealList = new ArrayList<>();
+    private int totalPrice = 0;
 
     public List<Prototype> getMealList() {
         return mealList;
@@ -12,6 +15,7 @@ public class PrototypeRegistry {
 
     public void add(Prototype result) {
         mealList.add(result);
+        totalPrice += result.getCost();
     }
 
     public Prototype getByMainDish(String mainDish) {
@@ -39,5 +43,15 @@ public class PrototypeRegistry {
             }
         }
         return null;
+    }
+
+    // Originator
+    public OrderMemento snapshot() {
+        return new OrderMemento(mealList, totalPrice);
+    }
+
+    public void restore(OrderMemento memento) {
+        mealList = (List<Prototype>) memento.getMealList();
+        totalPrice = memento.getTotalPrice();
     }
 }

@@ -14,6 +14,8 @@ import iterator.Iterator;
 import iterator.OrderList;
 import iterator.Receipt;
 import mediator.*;
+import memento.OrderHistory;
+import observer.MenuPublisher;
 import prototype.Prototype;
 import prototype.PrototypeRegistry;
 import proxy.Configuration;
@@ -28,10 +30,13 @@ public class Application {
     private static final Scanner sc = new Scanner(System.in);
     private static final PrototypeRegistry registry = new PrototypeRegistry();
     private static final DeliveryService deliveryService = new DeliveryService();
+    // Memento
+    private static final OrderHistory history = new OrderHistory();
 
     public static void main(String[] args) {
         System.out.println("Welcome!");
         showMenu();
+        history.snapshot(registry);
 
         Director director = new Director();
         MealBuilder builder = new MealBuilder();
@@ -40,7 +45,10 @@ public class Application {
             System.out.println("Do you wanna add meal? (YES/NO)");
             String choice = sc.nextLine();
 
-            if (choice.equals("YES")) addMeal(director, builder);
+            if (choice.equals("YES")) {
+                addMeal(director, builder);
+                history.snapshot(registry);
+            }
             else break;
         }
 
@@ -48,11 +56,32 @@ public class Application {
             System.out.println("Do you wanna edit your meal? (YES/NO)");
             String choice = sc.nextLine();
 
-            if (choice.equals("YES")) editMeal(director, builder);
+            if (choice.equals("YES")) {
+                editMeal(director, builder);
+                history.snapshot(registry);
+            }
             else break;
         }
 
         showAllMeals();
+
+        // State
+        changeState();
+
+        // Memento
+        if (!registry.getMealList().isEmpty()) {
+            System.out.println("\nDo you wanna back up meals? (YES/NO)");
+            String choice = sc.nextLine();
+
+            if (choice.equals("YES")) {
+                backUpMeals();
+            }
+        }
+
+        // Observer
+        if (Configuration.ROLE.equals("admin")){
+            changeMenu();
+        }
 
         // Command
         if (Configuration.PASS) {
@@ -75,6 +104,78 @@ public class Application {
 
         // Mediator
         waiterWork();
+    }
+
+    private static void changeState() {
+        System.out.println("\nPreparing meals...");
+
+        for (int i = 0; i < registry.getMealList().size(); i++) {
+            Meal meal = (Meal) registry.getMealList().get(i);
+
+            int nextCount = new Random().nextInt(3);
+            int prevCount = new Random().nextInt(3);
+            
+            for (int j = 0; j < nextCount; j++) {
+                meal.nextState();
+            }
+
+//            for (int j = 0; j < prevCount; j++) {
+//                meal.prevState();
+//            }
+        }
+
+        showAllMeals();
+    }
+
+    private static void changeMenu() {
+        MenuPublisher publisher = new MenuPublisher();
+
+        publisher.subscribe(new Man("Josh"));
+        publisher.subscribe(new Woman("Lisa"));
+        publisher.subscribe(new Woman("Jessie"));
+        publisher.subscribe(new Commission("David"));
+
+        System.out.println("\n[ADMIN PAGE]");
+
+        System.out.println("Enter name of NEW main dish:");
+        String mainDish = sc.nextLine();
+        publisher.addMainDish(mainDish);
+
+        System.out.println("Enter name of NEW side:");
+        String side = sc.nextLine();
+        publisher.addSide(side);
+
+        System.out.println("Enter name of NEW drink:");
+        String drink = sc.nextLine();
+        publisher.addDrink(drink);
+    }
+
+    private static void backUpMeals() {
+        System.out.println("Enter the count of UNDO operations to perform:");
+
+        int count;
+        while (true) {
+            try {
+                count = Integer.parseInt(sc.nextLine());
+            }
+            catch (Exception e) {
+                System.out.println("INVALID");
+                continue;
+            }
+
+            if (count <= registry.getMealList().size() && count >= 1) {
+                break;
+            }
+            else {
+                System.out.println("INVALID");
+            }
+        }
+
+        for (int k = 1; k <= count + 1; k++) {
+            history.undo(registry);
+        }
+
+        showAllMeals();
     }
 
     private static void waiterWork() {

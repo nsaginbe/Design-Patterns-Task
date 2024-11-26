@@ -1,9 +1,16 @@
 package mediator;
 
+import observer.Observer;
+
 // Component
-public abstract class Client {
+// Subscriber
+public abstract class Client implements Observer {
     protected String name;
     protected Mediator mediator;
+
+    public Client(String name) {
+        this.name = name;
+    }
 
     public Client(String name, Mediator mediator) {
         this.name = name;
@@ -12,4 +19,7 @@ public abstract class Client {
 
     public abstract String getName();
     public abstract void action(String message);
+
+    // Observer
+    public abstract void update(String meal);
 }
